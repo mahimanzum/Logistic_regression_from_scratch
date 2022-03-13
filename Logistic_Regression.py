@@ -82,7 +82,6 @@ def train(X, y, bs, epochs, lr):
     
     # Initializing weights and bias to zeros.
     w = np.zeros((n,1))
-    b = 0
     
     # Reshaping y.
     y = y.reshape(m,1)
@@ -109,17 +108,18 @@ def train(X, y, bs, epochs, lr):
             dw = gradients(xb, yb, y_hat)
             w += lr*dw
 
-        l = loss(y, sigmoid(np.dot(X, w) + b))
+        l = loss(y, sigmoid(np.dot(X, w)))
         tr_acc = accuracy_score(TRAIN_Y, predict(TRAIN_X, w))
         te_acc = accuracy_score(TEST_Y, predict(TEST_X, w))
         losses.append(l)
         train_acc.append(tr_acc)
         test_acc.append(te_acc)
+        print("loss = ", l)
         print("training accuracy ", tr_acc)
         print("testing accuracy ", te_acc)
         
     # returning weights, bias and losses(List).
-    return w, b, losses
+    return w,losses, train_acc, test_acc
 
 
 def predict(X, w):
@@ -140,7 +140,15 @@ def predict(X, w):
     
     return np.array(pred_class)
 
-w, b, l = train(TRAIN_X, TRAIN_Y, bs=100, epochs=100, lr=0.1/len(TRAIN_X))
-
+w, l, train_acc, test_acc = train(TRAIN_X, TRAIN_Y, bs=100, epochs=100, lr=0.1/len(TRAIN_X))
+plt.plot([i for i in range(1, 101)], train_acc, label = "Training Accuracy")
+plt.plot([i for i in range(1, 101)], test_acc, label = "Testing Accuracy")
+plt.legend()
+plt.savefig('train_test.png', dpi=300)
+plt.clf()
+plt.plot([i for i in range(1, 101)], l, label = "Log Liklihood")
+plt.legend()
+plt.savefig('log_liklihood.png', dpi=300)
+plt.clf()
 #print(TRAIN_X[1])
 #print(TRAIN_X.shape)
